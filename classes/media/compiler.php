@@ -2,36 +2,49 @@
 
 abstract class Media_Compiler {
 
-	public function copy_file($source, $destination, $symlink = TRUE)
-	{
-		$this->make_missing_directories($destination);
-
-		if ($symlink AND Kohana::$config->load('minion-media')->symlinks)
-		{
-			exec('ln -sf '.escapeshellarg($source).' '.escapeshellarg($destination));
-		}
-		else
-		{
-			copy($source, $destination);
-		}
-	}
-
+	/**
+	 * Add contents to the file specified, while
+	 * also recursively creating the directory the
+	 * file should be located in if it doesn't exist
+	 *
+	 * @param string $filepath The file location
+	 * @param string $contents The file contents
+	 */
 	public function put_contents($filepath, $contents)
 	{
+		// Genearte the directory tree
 		$this->make_missing_directories($filepath);
+
+		// Create the file with the contents
 		file_put_contents($filepath, $contents);
 	}
 
+	/**
+	 * Recursively create a directory path in the
+	 * filesysystem if the path doesn't exist
+	 *
+	 * @param string $filepath The file path to create
+	 */
 	public function make_missing_directories($filepath)
 	{
+		// Get the real directory path
 		$directory = pathinfo($filepath, PATHINFO_DIRNAME);
+
+		// Create missing directories recursively
 		if ( ! is_dir($directory))
 		{
-			// Make any missing directory
 			mkdir($directory, 0777, TRUE);
 		}
 	}
 
-	abstract public function compile(array $files, array $options);
+	/**
+	 * Compile a type of media source and place
+	 * the compiled file(s) into the configured
+	 * location in the applications media directory
+	 *
+	 * @param array $filepaths Files to compile
+	 * @param array $options Compiler options
+	 */
+	abstract public function compile(array $filepaths, array $options);
 
 }
