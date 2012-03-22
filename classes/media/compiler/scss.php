@@ -2,6 +2,12 @@
 
 class Media_Compiler_SCSS extends Media_Compiler {
 
+	private $_options = array(
+		'style'   => NULL,
+		'compass' => TRUE,
+		'cache'   => APPPATH.'cache',
+	);
+
 	public function compile(array $filepaths, array $options)
 	{
 		foreach ($filepaths as $relative_path => $absolute_path)
