@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
 abstract class Media_Compiler {
 
@@ -31,4 +31,7 @@ abstract class Media_Compiler {
 			mkdir($directory, 0777, TRUE);
 		}
 	}
+
+	abstract public function compile(array $files, array $options);
+
 }

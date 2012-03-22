@@ -1,6 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Media_Compiler_SCSS extends Media_Compiler implements Media_ICompiler {
+class Media_Compiler_SCSS extends Media_Compiler {
 
 	public function compile(array $filepaths, array $options)
 	{
@@ -38,4 +38,5 @@ class Media_Compiler_SCSS extends Media_Compiler implements Media_ICompiler {
 		// Remove the tmp directory
 		exec('rm -R '.escapeshellarg($options['tmp_dir']));
 	}
+
 }

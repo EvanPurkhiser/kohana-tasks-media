@@ -1,6 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
-class Media_Compiler_JS extends Media_Compiler implements Media_ICompiler {
+class Media_Compiler_JS extends Media_Compiler {
 
 	public function compile(array $filepaths, array $options)
 	{
@@ -73,4 +73,5 @@ class Media_Compiler_JS extends Media_Compiler implements Media_ICompiler {
 	{
 		return (basename($a) < basename($b)) ? -1 : 1;
 	}
+
 }

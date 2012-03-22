@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
 
 class Minion_Task_Media_Watch extends Minion_Task {
 
