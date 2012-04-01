@@ -38,6 +38,44 @@ abstract class Media_Compiler {
 	}
 
 	/**
+	 * Execute a given command and pipe the STDERR and
+	 * STDOUT to seprate places so we can get both and
+	 * throw and error if we run into any problems.
+	 *
+	 * @param string $command The command to execute
+	 * @return array the STDERR and STDOUT as an arry
+	 */
+	public function exec($command)
+	{
+		// Setup the file descriptors specification
+		$descriptsspec = array(
+			1 => array('pipe', 'w'),
+			2 => array('pipe', 'w'),
+		);
+
+		// Store the pipes in this array
+		$pipes = array();
+
+		// Execute the command
+		$resource = proc_open($command, $descriptsspec, $pipes);
+
+		// Setup the output
+		$output = array(
+			1 => stream_get_contents($pipes[1]),
+			2 => stream_get_contents($pipes[2]),
+		);
+
+		// Close the pipes
+		array_map('fclose', $pipes);
+
+		// Make sure the process didn't exit with a non-zero value
+		if (trim(proc_close($resource)))
+			throw new Kohana_Exception($output[2]);
+
+		return $output;
+	}
+
+	/**
 	 * Compile a list of files and save them into
 	 * their respective output location defined
 	 * in the compiler configuration
