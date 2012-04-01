@@ -26,14 +26,14 @@ return array(
 			// Options for the sass compiler
 			'options' => array(
 
-				// Valid style options are compressed, expaneded, and nested
-				'style' => 'nested',
+				// Should the CSS be compressed?
+				'compress' => TRUE,
 
 				// Make compass includes available?
 				'compass' => FALSE,
 
 				// Where to cache the pre-compiled partials
-				'cache_path' => APPPATH.'cache',
+				'cache_path' => APPPATH.'cache/sass-cache',
 
 				// Where to save compiled sass files to
 				'output' => APPPATH.'media',
