@@ -5,40 +5,46 @@ class Minion_Task_Media_Compile extends Minion_Task {
 	public function execute(array $config)
 	{
 		// Load the modules configuration options
-		$module_config = Kohana::$config->load('minion-media');
+		$mconfig = Kohana::$config->load('minion/media');
 
-		$media = Arr::flatten(Kohana::list_files('media'));
+		// Get all of the files in the configured media dicretory
+		$media = Arr::flatten(Kohana::list_files($mconfig->source));
 
-
-		foreach ($module_config->compilers as $key => $info)
+		// Iterate over each of the comiplers as we go
+		foreach ($mconfig->compilers as $compiler => $info)
 		{
+			// Make sure the compiler is enabled
 			if ( ! is_array($info))
-				continue; // This compiler group was disabled in the config
+				continue;
 
 			$files = array();
 
-			// If --pattern was specified, only worry about matching compilers
-			if ($config['pattern'] !== NULL)
-			{
-				if ( ! preg_match($info['pattern'], $config['pattern']))
-					continue; // Move on to the next compiler
-			}
-
+			// Compile a list of files to be compiled
 			foreach ($media as $relative => $filepath)
 			{
-				// Check if the path matches the pattern for the compiler
-				if (preg_match($info['pattern'], $relative))
-				{
-					Minion_CLI::write('('.$key.') Matched '.$relative);
-					$files[$relative] = $filepath;
-				}
+				// Trim the source path from the begining of the relative path
+				$relative = substr($relative, strlen($mconfig->source) + 1);
+
+				// Make sure the path search path matches
+				if (strpos($relative, $info['search_path']) !== 0)
+					continue;
+
+				// Trim the source path from the begining of the relative path
+				$relative = substr($relative, strlen($info['search_path']) + 1);
+
+				// Make sure that the file name matches the
+				if ( ! preg_match($info['pattern'], basename($filepath)))
+					continue;
+
+				// Alert that we have matched a file to compile
+				Minion_CLI::write('['.$compiler.'] Compiling '.$relative);
+				$files[$relative] = $filepath;
 			}
 
+			// Compile these files with the compiler
 			if ( ! empty($files))
 			{
-				// Compile these files
-				$class_name = $info['class'];
-				$compiler = new $class_name;
+				$compiler = new $info['class'];
 				$compiler->compile($files, Arr::get($info, 'options', array()));
 			}
 		}
