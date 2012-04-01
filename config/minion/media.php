@@ -3,7 +3,7 @@
 return array(
 
 	// Where should the media source files reside
-	'sources' => APPPATH.'media-src',
+	'source' => 'media-src',
 
 	// Setup the different compilers to run, each compiler will recursively
 	// run through the search and locate files that match the pattern. After
@@ -12,7 +12,7 @@ return array(
 	'compilers' => array(
 
 		// SASS CSS pre-processor,
-		'sass' => array(
+		'SASS' => array(
 
 			// The class used to compile SASS
 			'class' => 'Media_Compiler_SASS',
@@ -41,7 +41,7 @@ return array(
 		),
 
 		// Javascript compressor using uglify-js
-		'js' => array(
+		'Javascript' => array(
 
 			// The class to use to compile the javascript files
 			'class' => 'Media_Compiler_JS',
