@@ -45,7 +45,7 @@ class Media_Compiler_SASS extends Media_Compiler {
 			// If there was anything printed to STDERR save the contents
 			if ( ! empty($output[2]))
 			{
-				$warnings[$relative] = trim($output[2]);
+				$warnings[$relative] = $output[2];
 			}
 		}
 

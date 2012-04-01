@@ -61,8 +61,8 @@ abstract class Media_Compiler {
 
 		// Setup the output
 		$output = array(
-			1 => stream_get_contents($pipes[1]),
-			2 => stream_get_contents($pipes[2]),
+			1 => trim(stream_get_contents($pipes[1])),
+			2 => trim(stream_get_contents($pipes[2])),
 		);
 
 		// Close the pipes
