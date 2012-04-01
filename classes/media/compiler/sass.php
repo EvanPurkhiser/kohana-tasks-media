@@ -8,6 +8,8 @@ class Media_Compiler_SASS extends Media_Compiler {
 		if ( ! `which sass`)
 			throw new Kohana_Exception("The SASS compiler must be installed");
 
+		$warnings = array();
+
 		// Compile each of the sass files
 		foreach ($filepaths as $relative => $absolute)
 		{
@@ -30,9 +32,24 @@ class Media_Compiler_SASS extends Media_Compiler {
 				$command .= ' --compass';
 			}
 
-			var_dump($command);
+			// Execute the sass command
+			$output = $this->exec($command);
 
+			// Get the relative path without the extension
+			$path = dirname($relative).'/'.pathinfo($relative, PATHINFO_FILENAME);
+
+			// Save the contents from STDOUT to the output file
+			$this->put_contents(strtr($options['output'],
+				array(':relpath' => $path)), $output[1]);
+
+			// If there was anything printed to STDERR save the contents
+			if ( ! empty($output[2]))
+			{
+				$warnings[$relative] = trim($output[2]);
+			}
 		}
+
+		return $warnings;
 	}
 
 }

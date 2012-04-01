@@ -82,6 +82,7 @@ abstract class Media_Compiler {
 	 *
 	 * @param array $filepaths A list of files to be compiled
 	 * @param array $options Compiler options
+	 * @return string Any warnings that may have been generated
 	 */
 	abstract public function compile(array $filepaths, array $options);
 
