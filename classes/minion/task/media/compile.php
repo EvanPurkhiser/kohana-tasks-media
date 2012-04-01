@@ -37,15 +37,29 @@ class Minion_Task_Media_Compile extends Minion_Task {
 					continue;
 
 				// Alert that we have matched a file to compile
-				Minion_CLI::write('['.$compiler.'] Compiling '.$relative);
+				Minion_CLI::write('['.$compiler.'] Compiling '.$relative, 'green');
 				$files[$relative] = $filepath;
 			}
 
 			// Compile these files with the compiler
 			if ( ! empty($files))
 			{
-				$compiler = new $info['class'];
-				$compiler->compile($files, Arr::get($info, 'options', array()));
+				try
+				{
+					$compiler = new $info['class'];
+					$warnings = $compiler->compile($files, $info['options']);
+
+					// Write out the warning messages
+					foreach ($warnings as $warning)
+					{
+						Minion_CLI::write($warning, 'yellow');
+					}
+				}
+				catch (Kohana_Exception $e)
+				{
+					// Write out the error message
+					Minion_CLI::write($e->getMessage(), 'red');
+				}
 			}
 		}
 	}
