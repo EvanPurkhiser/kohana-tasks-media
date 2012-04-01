@@ -4,79 +4,38 @@ class Media_Compiler_JS extends Media_Compiler {
 
 	public function compile(array $filepaths, array $options)
 	{
-		var_dump($filepaths);
+		// Make sure that uglify-js is installed
+		if ( ! `which uglifyjs`)
+			throw new Kohana_Exception("Uglify-JS must be installed");
 
-		return;
+		// Sort the files by their paths
+		ksort($filepaths);
 
+		// Use awk to combine files with newlines after each file
+		$command = "awk 'FNR==1{print \"\"}1'";
 
-		// Sort by filename first (things like foo/bar/01.something.js will sort by 01.something.js)
-		uasort($filepaths, array($this, 'sort_by_filename'));
-
-		$file_meta = array();
-
-		foreach ($filepaths as $relative_path => $absolute_path)
+		// Setup the command to combine and process the js files
+		foreach ($filepaths as $relative => $absolute)
 		{
-			// Exclude the save paths
-			if (in_array($absolute_path, $options['save_paths']))
-				continue;
-
-			foreach ($options['concat'] as $group => $properties)
-			{
-				// If the relative path matches the pattern
-				if (preg_match($properties['pattern'], $relative_path))
-				{
-					// This file belongs to this group
-					$file_meta[$properties['order']][$relative_path] = $absolute_path;
-					break; // No need to check the other groups
-				}
-			}
+			$command .= ' '.escapeshellarg($absolute);
 		}
 
-		$unmin_path = $options['save_paths']['unminified'];
-		$min_path = $options['save_paths']['minified'];
+		// Pipe the merged files into uglifyjs
+		$command .= ' | uglifyjs';
 
-		if (empty($file_meta))
+		// Check if we want to beautify the file
+		if (Arr::get($options, 'beautify'))
 		{
-			// Our files are empty because there is nothing to compile
-			$this->put_contents($unmin_path, '');
-			if ($min_path !== FALSE)
-			{
-				$this->put_contents($min_path, '');
-			}
-
-			return TRUE;
+			$command .= ' --beautify';
 		}
 
-		// Sort the $file_meta array by order (key) before concatenating
-		ksort($file_meta);
+		// Execute the uglifyjs command
+		$output = $this->exec($command);
 
-		$files = Arr::flatten($file_meta);
-		$content = '';
+		// Save the contents to the output file
+		$this->put_contents($options['output'], $output[1]);
 
-		foreach ($files as $path)
-		{
-			$content .= file_get_contents($path) . PHP_EOL;
-		}
-
-		// Save the unminified version
-		$this->put_contents($unmin_path, $content);
-
-		if ($min_path !== FALSE)
-		{
-			// Not mangling variable names and not removing unused code
-			$uglify_cmd = 'uglifyjs '
-				.'--no-mangle '
-				.'--no-dead-code '
-				.'--output '.escapeshellarg($min_path).' '
-				.escapeshellarg($unmin_path);
-
-			exec($uglify_cmd);
-		}
+		// Return any warnings
+		return $output[2];
 	}
-
-	public function sort_by_filename($a, $b)
-	{
-		return (basename($a) < basename($b)) ? -1 : 1;
-	}
-
 }
