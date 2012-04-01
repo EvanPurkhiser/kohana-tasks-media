@@ -1,3 +1,0 @@
-## [Media Tasks]()
-
-- [Configuration](configuration)

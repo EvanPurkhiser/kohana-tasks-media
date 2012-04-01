@@ -2,14 +2,13 @@
 
 class Minion_Task_Media_Compile extends Minion_Task {
 
-	protected $_config = array(
-		'pattern' => NULL,
-	);
-
 	public function execute(array $config)
 	{
-		$media = Arr::flatten(Kohana::list_files('media'));
+		// Load the modules configuration options
 		$module_config = Kohana::$config->load('minion-media');
+
+		$media = Arr::flatten(Kohana::list_files('media'));
+
 
 		foreach ($module_config->compilers as $key => $info)
 		{
