@@ -38,13 +38,13 @@ abstract class Media_Compiler {
 	}
 
 	/**
-	 * Compile a type of media source and place
-	 * the compiled file(s) into the configured
-	 * location in the applications media directory
+	 * Compile a list of files and save them into
+	 * their respective output location defined
+	 * in the compiler configuration
 	 *
-	 * @param array $paths Associative array of source => compiled file
+	 * @param array $filepaths A list of files to be compiled
 	 * @param array $options Compiler options
 	 */
-	abstract public function compile(array $paths, array $options);
+	abstract public function compile(array $filepaths, array $options);
 
 }

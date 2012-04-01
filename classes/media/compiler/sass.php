@@ -1,15 +1,14 @@
 <?php
 
-class Media_Compiler_SCSS extends Media_Compiler {
-
-	private $_options = array(
-		'style'   => NULL,
-		'compass' => TRUE,
-		'cache'   => APPPATH.'cache',
-	);
+class Media_Compiler_SASS extends Media_Compiler {
 
 	public function compile(array $filepaths, array $options)
 	{
+		var_dump($filepaths);
+
+		return;
+
+
 		foreach ($filepaths as $relative_path => $absolute_path)
 		{
 			$destination = $options['tmp_dir'].'/'.$relative_path;

@@ -4,6 +4,11 @@ class Media_Compiler_JS extends Media_Compiler {
 
 	public function compile(array $filepaths, array $options)
 	{
+		var_dump($filepaths);
+
+		return;
+
+
 		// Sort by filename first (things like foo/bar/01.something.js will sort by 01.something.js)
 		uasort($filepaths, array($this, 'sort_by_filename'));
 
