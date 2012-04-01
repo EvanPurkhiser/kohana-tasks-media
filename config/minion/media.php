@@ -27,7 +27,7 @@ return array(
 			'options' => array(
 
 				// Should the CSS be compressed?
-				'compress' => TRUE,
+				'compress' => Kohana::$environment === Kohana::PRODUCTION,
 
 				// Make compass includes available?
 				'compass' => FALSE,
