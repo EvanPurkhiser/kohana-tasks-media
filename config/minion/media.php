@@ -36,7 +36,7 @@ return array(
 				'cache_path' => APPPATH.'cache/sass-cache',
 
 				// Where to save compiled sass files to
-				'output' => APPPATH.'media',
+				'output' => APPPATH.'media/:relpath.css',
 			),
 		),
 
