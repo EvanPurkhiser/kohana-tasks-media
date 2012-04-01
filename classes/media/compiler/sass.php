@@ -49,7 +49,7 @@ class Media_Compiler_SASS extends Media_Compiler {
 			}
 		}
 
-		return $warnings;
+		return join(PHP_EOL, $warnings);
 	}
 
 }

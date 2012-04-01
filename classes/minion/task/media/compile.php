@@ -47,10 +47,10 @@ class Minion_Task_Media_Compile extends Minion_Task {
 				try
 				{
 					$compiler = new $info['class'];
-					$warnings = $compiler->compile($files, $info['options']);
+					$warning  = $compiler->compile($files, $info['options']);
 
 					// Write out the warning messages
-					foreach ($warnings as $warning)
+					if ( ! empty($warning))
 					{
 						Minion_CLI::write($warning, 'yellow');
 					}
