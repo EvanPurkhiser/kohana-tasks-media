@@ -1,10 +1,6 @@
 <?php
 
 return array(
-
-	// Where should the media source files reside
-	'source' => 'media-src',
-
 	// Setup the different compilers to run, each compiler will recursively
 	// run through the search and locate files that match the pattern. After
 	// finding all files that match the pattern it will then pass the file
@@ -18,7 +14,7 @@ return array(
 			'class' => 'Media_Compiler_SASS',
 
 			// The path to search for SASS files
-			'search_path' => 'stylesheets',
+			'search' => 'media-src/stylesheets',
 
 			// Regex that the file name must match to be compiled
 			'pattern' => '/^[^_].*\.sass$/',
@@ -47,7 +43,7 @@ return array(
 			'class' => 'Media_Compiler_JS',
 
 			// The path to search for Javascript files
-			'search_path' => 'javascript',
+			'search' => 'media-src/javascript',
 
 			// Regex that the filename must mach to be compiled
 			'pattern' => '/^.*\.js$/',

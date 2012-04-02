@@ -7,9 +7,6 @@ class Minion_Task_Media_Compile extends Minion_Task {
 		// Load the modules configuration options
 		$mconfig = Kohana::$config->load('minion/media');
 
-		// Get all of the files in the configured media dicretory
-		$media = Arr::flatten(Kohana::list_files($mconfig->source));
-
 		// Iterate over each of the comiplers as we go
 		foreach ($mconfig->compilers as $compiler => $info)
 		{
@@ -17,20 +14,16 @@ class Minion_Task_Media_Compile extends Minion_Task {
 			if ( ! is_array($info))
 				continue;
 
+			// Get all of the files in this compilers serach path
+			$media = Arr::flatten(Kohana::list_files($info['search']));
+
 			$files = array();
 
 			// Compile a list of files to be compiled
 			foreach ($media as $relative => $filepath)
 			{
-				// Trim the source path from the begining of the relative path
-				$relative = substr($relative, strlen($mconfig->source) + 1);
-
-				// Make sure the path search path matches
-				if (strpos($relative, $info['search_path']) !== 0)
-					continue;
-
-				// Trim the source path from the begining of the relative path
-				$relative = substr($relative, strlen($info['search_path']) + 1);
+				// Trim the search path from the begining of the relative path
+				$relative = substr($relative, strlen($info['search']) + 1);
 
 				// Make sure that the file name matches the
 				if ( ! preg_match($info['pattern'], basename($filepath)))
