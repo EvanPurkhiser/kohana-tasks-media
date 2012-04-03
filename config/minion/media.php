@@ -17,7 +17,7 @@ return array(
 			'search' => 'media-src/stylesheets',
 
 			// Regex that the file name must match to be compiled
-			'pattern' => '/^[^_].*\.sass$/',
+			'pattern' => '/^.*\.sass$/',
 
 			// Options for the sass compiler
 			'options' => array(

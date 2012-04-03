@@ -13,6 +13,10 @@ class Media_Compiler_SASS extends Media_Compiler {
 		// Compile each of the sass files
 		foreach ($filepaths as $relative => $absolute)
 		{
+			// Ignore sass files that begin with underscores
+			if (strpos(basename($absolute), '_') === 0)
+				continue;
+
 			// Start setting up the command to compile the SASS
 			$command = 'sass '.escapeshellarg($absolute);
 
