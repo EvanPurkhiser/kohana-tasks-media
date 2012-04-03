@@ -3,6 +3,21 @@
 abstract class Media_Compiler {
 
 	/**
+	 * The compilers configuration
+	 */
+	protected $_configuration;
+
+	/**
+	 * Set the configuration for this object
+	 *
+	 * @param array $configuration Compiler configuration
+	 */
+	public function __construct(array $configuration)
+	{
+		$this->_configuration = $configuration;
+	}
+
+	/**
 	 * Add contents to the file specified, while
 	 * also recursively creating the directory the
 	 * file should be located in if it doesn't exist
@@ -12,21 +27,6 @@ abstract class Media_Compiler {
 	 */
 	public function put_contents($filepath, $contents)
 	{
-		// Genearte the directory tree
-		$this->make_missing_directories($filepath);
-
-		// Create the file with the contents
-		file_put_contents($filepath, $contents);
-	}
-
-	/**
-	 * Recursively create a directory path in the
-	 * filesysystem if the path doesn't exist
-	 *
-	 * @param string $filepath The file path to create
-	 */
-	public function make_missing_directories($filepath)
-	{
 		// Get the real directory path
 		$directory = pathinfo($filepath, PATHINFO_DIRNAME);
 
@@ -35,6 +35,9 @@ abstract class Media_Compiler {
 		{
 			mkdir(dirname($directory), 0777, TRUE);
 		}
+
+		// Create the file with the contents
+		file_put_contents($filepath, $contents);
 	}
 
 	/**
@@ -76,14 +79,44 @@ abstract class Media_Compiler {
 	}
 
 	/**
+	 * Locate all of the files that exist in the search
+	 * path and match the file pattern specified in the
+	 * compiler configuration array
+	 *
+	 * @return array
+	 */
+	public function get_matching_files()
+	{
+		$config = $this->_configuration;
+		$files  = array();
+
+		// Get all of the files in this compilers serach path
+		$media = Arr::flatten(Kohana::list_files($config['search']));
+
+		// Compile a list of files to be compiled
+		foreach ($media as $relative => $filepath)
+		{
+			// Trim the search path from the begining of the relative path
+			$relative = substr($relative, strlen($config['search']) + 1);
+
+			// Make sure that the file name matches the
+			if ( ! preg_match($config['pattern'], basename($filepath)))
+				continue;
+
+			$files[$relative] = $filepath;
+		}
+
+		return $files;
+	}
+
+	/**
 	 * Compile a list of files and save them into
 	 * their respective output location defined
 	 * in the compiler configuration
 	 *
 	 * @param array $filepaths A list of files to be compiled
-	 * @param array $options Compiler options
 	 * @return string Any warnings that may have been generated
 	 */
-	abstract public function compile(array $filepaths, array $options);
+	abstract public function compile(array $filepaths);
 
 }

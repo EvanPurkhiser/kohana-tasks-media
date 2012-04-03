@@ -2,8 +2,10 @@
 
 class Media_Compiler_JS extends Media_Compiler {
 
-	public function compile(array $filepaths, array $options)
+	public function compile(array $filepaths)
 	{
+		$config = $this->_configuration['options'];
+
 		// Make sure that uglify-js is installed
 		if ( ! `which uglifyjs`)
 			throw new Kohana_Exception("Uglify-JS must be installed");
@@ -24,7 +26,7 @@ class Media_Compiler_JS extends Media_Compiler {
 		$command .= ' | uglifyjs';
 
 		// Check if we want to beautify the file
-		if (Arr::get($options, 'beautify'))
+		if (Arr::get($config, 'beautify'))
 		{
 			$command .= ' --beautify';
 		}
@@ -33,7 +35,7 @@ class Media_Compiler_JS extends Media_Compiler {
 		$output = $this->exec($command);
 
 		// Save the contents to the output file
-		$this->put_contents($options['output'], $output[1]);
+		$this->put_contents($config['output'], $output[1]);
 
 		// Return any warnings
 		return $output[2];

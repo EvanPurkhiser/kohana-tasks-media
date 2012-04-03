@@ -2,8 +2,10 @@
 
 class Media_Compiler_SASS extends Media_Compiler {
 
-	public function compile(array $filepaths, array $options)
+	public function compile(array $filepaths)
 	{
+		$config = $this->_configuration['options'];
+
 		// Make sure the sass binary is installed
 		if ( ! `which sass`)
 			throw new Kohana_Exception("The SASS compiler must be installed");
@@ -22,16 +24,16 @@ class Media_Compiler_SASS extends Media_Compiler {
 
 			// Set the caching location for the sass files
 			$command .= ' --cache-location '.
-				escapeshellarg(Arr::get($options, 'cache_path', '/tmp/sass-cache'));
+				escapeshellarg(Arr::get($config, 'cache_path', '/tmp/sass-cache'));
 
 			// Check if we should compress the CSS
-			if (Arr::get($options, 'compress'))
+			if (Arr::get($config, 'compress'))
 			{
 				$command .= ' --style compressed';
 			}
 
 			// Check if we should make compass includes available
-			if (Arr::get($options, 'compass'))
+			if (Arr::get($config, 'compass'))
 			{
 				$command .= ' --compass';
 			}
@@ -43,7 +45,7 @@ class Media_Compiler_SASS extends Media_Compiler {
 			$path = dirname($relative).'/'.pathinfo($relative, PATHINFO_FILENAME);
 
 			// Save the contents from STDOUT to the output file
-			$this->put_contents(strtr($options['output'],
+			$this->put_contents(strtr($config['output'],
 				array(':relpath' => $path)), $output[1]);
 
 			// If there was anything printed to STDERR save the contents

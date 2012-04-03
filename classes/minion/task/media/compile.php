@@ -8,52 +8,37 @@ class Minion_Task_Media_Compile extends Minion_Task {
 		$mconfig = Kohana::$config->load('minion/media');
 
 		// Iterate over each of the comiplers as we go
-		foreach ($mconfig->compilers as $compiler => $info)
+		foreach ($mconfig->compilers as $type => $settings)
 		{
 			// Make sure the compiler is enabled
-			if ( ! is_array($info))
+			if ( ! is_array($settings))
 				continue;
 
-			// Get all of the files in this compilers serach path
-			$media = Arr::flatten(Kohana::list_files($info['search']));
+			// Setup the compiler object
+			$compiler = new $settings['class']($settings);
 
-			$files = array();
+			// Find all valid files to compile for this compiler
+			if ( ! $files = $compiler->get_matching_files())
+				continue;
 
-			// Compile a list of files to be compiled
-			foreach ($media as $relative => $filepath)
+			try
 			{
-				// Trim the search path from the begining of the relative path
-				$relative = substr($relative, strlen($info['search']) + 1);
+				// Compile the matched files
+				Minion_CLI::write("Compiling Media Type: {$type}", 'green');
+				$warning  = $compiler->compile($files);
 
-				// Make sure that the file name matches the
-				if ( ! preg_match($info['pattern'], basename($filepath)))
-					continue;
-
-				// Alert that we have matched a file to compile
-				Minion_CLI::write('['.$compiler.'] Compiling '.$relative, 'green');
-				$files[$relative] = $filepath;
+				// Write out the warning messages
+				if ( ! empty($warning))
+				{
+					Minion_CLI::write($warning, 'yellow');
+				}
 			}
-
-			// Compile these files with the compiler
-			if ( ! empty($files))
+			catch (Kohana_Exception $e)
 			{
-				try
-				{
-					$compiler = new $info['class'];
-					$warning  = $compiler->compile($files, $info['options']);
-
-					// Write out the warning messages
-					if ( ! empty($warning))
-					{
-						Minion_CLI::write($warning, 'yellow');
-					}
-				}
-				catch (Kohana_Exception $e)
-				{
-					// Write out the error message
-					Minion_CLI::write($e->getMessage(), 'red');
-				}
+				// Write out the error message
+				Minion_CLI::write($e->getMessage(), 'red');
 			}
 		}
 	}
+
 }
