@@ -2,68 +2,71 @@
 
 class Minion_Task_Media_Watch extends Minion_Task {
 
-	protected $_config = array(
-		'lifetime' => '600', // Run for 10 minutes by default
-	);
-
-	protected $_last_compiled_time;
 
 	public function execute(array $config)
 	{
-		$start_time = time();
-		$end_time = $start_time + (int) $config['lifetime'];
-		$this->compile();
+		// Load the modules configuration options
+		$mconfig = Kohana::$config->load('minion/media');
 
-		Minion_CLI::write('Polling for changes');
+		// Keep track of when we last compiled
+		$last_compiled = time();
 
+		// Note that we are now polling
+		Minion_CLI::write('Polling for changes', 'blue');
+
+		// Setup the compiler objects for each compiler type
+		foreach ($mconfig->compilers as $type => $settings)
+		{
+			// Make sure the compiler is enabled
+			if ( ! is_array($settings))
+				continue;
+
+			$compilers[$type] = new $settings['class']($settings);
+		}
+
+		// Loop fover so we can continually compile
 		while (TRUE)
 		{
-			foreach(Arr::flatten(Kohana::list_files('media')) as $relative => $filepath)
+			foreach ($compilers as $type => $compiler)
 			{
-				if (filemtime($filepath) > $this->_last_compiled_time)
+				// Find all valid files to compile for this compiler
+				if ( ! $files = $compiler->get_matching_files())
+					continue;
+
+				// Check if any of these files have been modified since last compile
+				foreach ($files as $relative => $absolute)
 				{
-					Minion_CLI::write('Changes detected: '.$filepath);
-					$this->compile($relative);
-					Minion_CLI::write('Polling for changes');
+					if (filemtime($absolute) < $last_compiled)
+						continue;
+
+					Minion_CLI::write("[{$type}] Changes detected to {$relative}, compiling", 'green');
+					$last_compiled = time();
+
+					try
+					{
+						// Compile the matched files
+						$warning  = $compiler->compile($files);
+
+						// Write out the warning messages
+						if ( ! empty($warning))
+						{
+							Minion_CLI::write($warning, 'yellow');
+						}
+
+						Minion_CLI::write("[{$type}] Done!", 'dark_gray');
+					}
+					catch (Kohana_Exception $e)
+					{
+						// Write out the error message
+						Minion_CLI::write($e->getMessage(), 'red');
+					}
+
 					break;
 				}
 			}
 
-			if (time() > $end_time)
-			{
-				// We exceeded the lifetime for this process
-				Minion_CLI::write('Lietime ended');
-				return;
-			}
-
-			usleep(100000);
+			usleep(500000);
 		}
 	}
 
-	public function compile($path = NULL)
-	{
-		if ($path === NULL)
-		{
-			Minion_CLI::write('Compiling all media files');
-			// Execute the command to compile (We assume minion is in DOCROOT for now)
-			exec('./minion media:compile');
-		}
-		else
-		{
-			Minion_CLI::write('Compiling files with pattern "'.$path.'"');
-			// Execute the command to compile (We assume minion is in DOCROOT for now)
-			exec('./minion media:compile --pattern='.escapeshellarg($path));
-		}
-
-		sleep(1);
-		$this->_last_compiled_time = time();
-		Minion_CLI::write('Done');
-	}
-
-	public function build_validation(Validation $validation)
-	{
-		return parent::build_validation($validation)
-			->rule('lifetime', 'not_empty')
-			->rule('lifetime', 'digit');
-	}
 }
