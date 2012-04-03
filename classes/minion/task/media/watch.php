@@ -24,6 +24,13 @@ class Minion_Task_Media_Watch extends Minion_Task {
 			$compilers[$type] = new $settings['class']($settings);
 		}
 
+		// Make sure atleast one compiler is enabled
+		if (empty($compilers))
+		{
+			Minion_CLI::write('No compiler types enabled. Aborting', 'red');
+			exit(1);
+		}
+
 		// Loop fover so we can continually compile
 		while (TRUE)
 		{
@@ -36,6 +43,7 @@ class Minion_Task_Media_Watch extends Minion_Task {
 				// Check if any of these files have been modified since last compile
 				foreach ($files as $relative => $absolute)
 				{
+					// Ignore files older than the last time we compiled
 					if (filemtime($absolute) < $last_compiled)
 						continue;
 
@@ -52,14 +60,15 @@ class Minion_Task_Media_Watch extends Minion_Task {
 						{
 							Minion_CLI::write($warning, 'yellow');
 						}
-
-						Minion_CLI::write("[{$type}] Done!", 'dark_gray');
 					}
 					catch (Kohana_Exception $e)
 					{
 						// Write out the error message
 						Minion_CLI::write($e->getMessage(), 'red');
 					}
+
+					// Compiling completed
+					Minion_CLI::write("[{$type}] Done!", 'dark_gray');
 
 					break;
 				}
