@@ -48,7 +48,6 @@ class Minion_Task_Media_Watch extends Minion_Task {
 						continue;
 
 					Minion_CLI::write("[{$type}] Changes detected to {$relative}, compiling", 'green');
-					$last_compiled = time();
 
 					try
 					{
@@ -69,6 +68,7 @@ class Minion_Task_Media_Watch extends Minion_Task {
 
 					// Compiling completed
 					Minion_CLI::write("[{$type}] Done!", 'dark_gray');
+					$last_compiled = time();
 
 					break;
 				}
