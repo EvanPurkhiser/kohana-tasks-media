@@ -26,6 +26,8 @@ return array(
 				'compress' => Kohana::$environment === Kohana::PRODUCTION,
 
 				// Make compass includes available?
+				// If enabled the compass.rb file will be read in the same directory
+				// as the SASS file being compiled
 				'compass' => FALSE,
 
 				// Where to cache the pre-compiled partials

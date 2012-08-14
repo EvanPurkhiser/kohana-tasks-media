@@ -19,8 +19,11 @@ class Media_Compiler_SASS extends Media_Compiler {
 			if (strpos(basename($absolute), '_') === 0)
 				continue;
 
+			// Ensure were in the directory of the stylesheet when compiling
+			$command = 'cd '.escapeshellcmd(dirname($absolute)).' && ';
+
 			// Start setting up the command to compile the SASS
-			$command = 'sass '.escapeshellarg($absolute);
+			$command .= 'sass '.escapeshellarg($absolute);
 
 			// Set the caching location for the sass files
 			$command .= ' --cache-location '.
