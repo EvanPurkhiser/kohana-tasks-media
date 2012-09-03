@@ -10,34 +10,72 @@ class Media_Compiler_JS extends Media_Compiler {
 		if ( ! `which uglifyjs`)
 			throw new Kohana_Exception("Uglify-JS must be installed");
 
-		// Sort the files by their paths
-		ksort($filepaths);
-
-		// Use awk to combine files with newlines after each file
-		$command = "awk 'FNR==1{print \"\"}1'";
-
-		// Setup the command to combine and process the js files
-		foreach ($filepaths as $relative => $absolute)
+		// Combine the files using AWK if enabled
+		if ($config['combine'])
 		{
-			$command .= ' '.escapeshellarg($absolute);
+			// Sort the files by their paths
+			ksort($filepaths);
+
+			// Use awk to combine files with newlines after each file
+			$command = "awk 'FNR==1{print \"\"}1'";
+
+			// Setup the command to combine and process the js files
+			foreach ($filepaths as $relative => $absolute)
+			{
+				$command .= ' '.escapeshellarg($absolute);
+			}
+
+			// run the uglifyJS utility
+			$output = $this->uglifyJS($command);
+
+			// Save the contents to the output file
+			$this->put_contents($config['output'], $output[1]);
+
+			// Return any warnings
+			return $output[2];
 		}
 
-		// Pipe the merged files into uglifyjs
-		$command .= ' | uglifyjs';
+		// Compile each file on it's own and save into the output
+		else
+		{
+			$warnings = array();
+
+			foreach ($filepaths as $relative => $absolute)
+			{
+				// Output the contents of the file
+				$command = 'cat '.escapeshellarg($absolute);
+
+				// run the uglifyJS utility
+				$output = $this->uglifyJS($command);
+
+				// Save the contents of the output file
+				$this->put_contents($config['output'].$relative, $output[1]);
+
+				// Keep the warnings
+				$warnings[] = $output[2];
+			}
+
+			return implode(PHP_EOL, array_filter($warnings));
+		}
+	}
+
+	/**
+	 * Run the uglifyJS utility, returning the output array from exec
+	 *
+	 * @param  string $pipe The command to pipe into uglifyJS
+	 * @return array
+	 */
+	protected function uglifyJS($pipe)
+	{
+		$command = $pipe.' | uglifyjs';
 
 		// Check if we want to beautify the file
-		if (Arr::get($config, 'beautify'))
+		if (Arr::get($this->_configuration['options'], 'beautify'))
 		{
 			$command .= ' --beautify';
 		}
 
 		// Execute the uglifyjs command
-		$output = $this->exec($command);
-
-		// Save the contents to the output file
-		$this->put_contents($config['output'], $output[1]);
-
-		// Return any warnings
-		return $output[2];
+		return $this->exec($command);
 	}
 }

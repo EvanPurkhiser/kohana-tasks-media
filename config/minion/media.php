@@ -56,7 +56,11 @@ return array(
 				// Beautify the javascript code (indent it mostly)
 				'beautify' => Kohana::$environment !== Kohana::PRODUCTION,
 
-				// Where to save the compiled concatinated file
+				// Should all files be combined into one
+				'combine' => TRUE,
+
+				// Where to save the compiled file(s)
+				// If `combine` is TRUE, this should be a single file name
 				'output' => APPPATH.'media/application.js',
 			),
 		),
