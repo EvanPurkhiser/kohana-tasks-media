@@ -33,7 +33,7 @@ abstract class Media_Compiler {
 		// Create missing directories recursively
 		if ( ! is_dir($directory))
 		{
-			mkdir(dirname($directory), 0777, TRUE);
+			mkdir($directory, 0777, TRUE);
 		}
 
 		// Create the file with the contents
