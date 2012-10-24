@@ -1,9 +1,9 @@
 <?php
 
-class Minion_Task_Media_Watch extends Minion_Task {
+class Task_Media_Watch extends Minion_Task {
 
 
-	public function execute(array $config)
+	protected function _execute(array $params)
 	{
 		// Load the modules configuration options
 		$mconfig = Kohana::$config->load('minion/media');
@@ -12,7 +12,7 @@ class Minion_Task_Media_Watch extends Minion_Task {
 		$last_compiled = time();
 
 		// Note that we are now polling
-		Minion_CLI::write('Polling for changes', 'blue');
+		Minion_CLI::write(Minion_CLI::color("Polling for changes", 'blue'));
 
 		// Setup the compiler objects for each compiler type
 		foreach ($mconfig->compilers as $type => $settings)
@@ -27,7 +27,9 @@ class Minion_Task_Media_Watch extends Minion_Task {
 		// Make sure atleast one compiler is enabled
 		if (empty($compilers))
 		{
-			Minion_CLI::write('No compiler types enabled. Aborting', 'red');
+			Minion_CLI::write(Minion_CLI::color(
+				'No compiler types enabled. Aborting', 'red'));
+
 			exit(1);
 		}
 
@@ -47,7 +49,8 @@ class Minion_Task_Media_Watch extends Minion_Task {
 					if (filemtime($absolute) < $last_compiled)
 						continue;
 
-					Minion_CLI::write("[{$type}] Changes detected to {$relative}, compiling", 'green');
+					Minion_CLI::write(Minion_CLI::color(
+						"[{$type}] Changes detected to {$relative}, compiling", 'green'));
 
 					try
 					{
@@ -57,17 +60,18 @@ class Minion_Task_Media_Watch extends Minion_Task {
 						// Write out the warning messages
 						if ( ! empty($warning))
 						{
-							Minion_CLI::write($warning, 'yellow');
+							Minion_CLI::write(Minion_CLI::color($warning, 'yellow'));
 						}
 					}
 					catch (Kohana_Exception $e)
 					{
 						// Write out the error message
-						Minion_CLI::write($e->getMessage(), 'red');
+						Minion_CLI::write(Minion_CLI::color($e->getMessage(), 'red'));
 					}
 
 					// Compiling completed
-					Minion_CLI::write("[{$type}] Done!", 'dark_gray');
+					Minion_CLI::write(Minion_CLI::color("[{$type}] Done!", 'dark_gray'));
+
 					$last_compiled = time();
 
 					break;

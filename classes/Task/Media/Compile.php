@@ -1,8 +1,8 @@
 <?php
 
-class Minion_Task_Media_Compile extends Minion_Task {
+class Task_Media_Compile extends Minion_Task {
 
-	public function execute(array $config)
+	protected function _execute(array $params)
 	{
 		// Load the modules configuration options
 		$mconfig = Kohana::$config->load('minion/media');
@@ -23,20 +23,22 @@ class Minion_Task_Media_Compile extends Minion_Task {
 
 			try
 			{
+				Minion_CLI::write(Minion_CLI::color(
+					"Compiling Media Type: {$type}", 'green'));
+
 				// Compile the matched files
-				Minion_CLI::write("Compiling Media Type: {$type}", 'green');
 				$warning  = $compiler->compile($files);
 
 				// Write out the warning messages
 				if ( ! empty($warning))
 				{
-					Minion_CLI::write($warning, 'yellow');
+					Minion_CLI::write(Minion_CLI::color($warning, 'yellow'));
 				}
 			}
 			catch (Kohana_Exception $e)
 			{
 				// Write out the error message
-				Minion_CLI::write($e->getMessage(), 'red');
+				Minion_CLI::write(Minion_CLI::color($e->getMessage(), 'red'));
 			}
 		}
 	}
