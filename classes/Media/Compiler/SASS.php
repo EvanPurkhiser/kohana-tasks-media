@@ -41,6 +41,13 @@ class Media_Compiler_SASS extends Media_Compiler {
 				$command .= ' --compass';
 			}
 
+			// Include debug info. This is useful with the chrome experimental
+			// SASS source-map feature
+			if (Arr::get($config, 'debug'))
+			{
+				$command .= ' --debug-info';
+			}
+
 			// Execute the sass command
 			$output = $this->exec($command);
 
