@@ -1,0 +1,22 @@
+{
+	"name": "evanpurkhiser/kohana-tasks-media",
+	"description": "Kohana tasks to watch and compile media files, uses mionion and media modules",
+	"license": "MIT",
+	"keywords": ["kohana", "media", "assets", "build"],
+	"authors": [
+		{
+			"name": "Evan Purkhiser",
+			"email": "evanpurkhiser@gmail.com"
+		}
+	],
+	"require": {
+		"php"                 : ">=5.2.4",
+		"kohana/core"         : "3.3.*",
+		"zeelot/kohana-media" : "1.3.*@dev"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-3.3/master": "3.3.x-dev"
+		}
+	}
+}
